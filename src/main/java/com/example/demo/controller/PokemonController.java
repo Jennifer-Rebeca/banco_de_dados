@@ -2,6 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Pokemon;
 import com.example.demo.repository.PokemonRepository;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,7 @@ public class PokemonController {
     private PokemonRepository repository;
 
     @GetMapping
+    @SecurityRequirements()
     public List<Pokemon> getAll() {
         return repository.findAll();
     }
@@ -37,6 +41,7 @@ public class PokemonController {
     }
 
     @GetMapping("/{id}")
+    @SecurityRequirements()
     public ResponseEntity<Pokemon> getById(@PathVariable Long id) {
         Optional<Pokemon> pokemon = repository.findById(id);
         return pokemon.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());

@@ -21,6 +21,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-h2console")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("com.auth0:java-jwt:4.4.0")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("com.h2database:h2")
