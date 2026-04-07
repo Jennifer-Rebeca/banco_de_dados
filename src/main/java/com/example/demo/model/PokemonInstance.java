@@ -1,58 +1,44 @@
 package com.example.demo.model;
 
+import java.util.UUID;
+
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Table(name = "pokemon_instance")
+@Table(name = "pokemon_instances")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PokemonInstance {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "pokemon_id", nullable = false)
     private Pokemon pokemon;
 
+    @Column(nullable = false)
     private Integer power;
+
+    @Column(nullable = false)
     private Boolean shine;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "trainer_id")
     private User trainer;
 
-    public PokemonInstance() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Pokemon getPokemon() {
-        return pokemon;
-    }
-
-    public void setPokemon(Pokemon pokemon) {
+    public PokemonInstance(Pokemon pokemon, Integer power, Boolean shine, User trainer) {
         this.pokemon = pokemon;
-    }
-
-    public Integer getPower() {
-        return power;
-    }
-
-    public void setPower(Integer power) {
         this.power = power;
-    }
-
-    public Boolean getShine() {
-        return shine;
-    }
-
-    public void setShine(Boolean shine) {
         this.shine = shine;
+        this.trainer = trainer;
     }
+
 }

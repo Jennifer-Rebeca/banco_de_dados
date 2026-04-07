@@ -38,6 +38,7 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/game/**").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/api/pokemons/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/pokemons").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/pokemons").hasRole("ADMIN")

@@ -1,14 +1,15 @@
 package com.example.demo.repository;
 
+import org.springframework.stereotype.Repository;
 import com.example.demo.model.PokemonInstance;
+import com.example.demo.model.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceUnit;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public class PokemonInstanceRepository {
@@ -16,72 +17,103 @@ public class PokemonInstanceRepository {
     @PersistenceUnit
     private EntityManagerFactory entityManagerFactory;
 
-    public List<PokemonInstance> findAll() {
-        EntityManager em = entityManagerFactory.createEntityManager();
+    public List<PokemonInstance> findAllByTrainer(User trainer) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
         try {
-            return em.createQuery("SELECT pi FROM PokemonInstance pi", PokemonInstance.class).getResultList();
+            return entityManager
+                    .createQuery("SELECT p FROM PokemonInstance p WHERE p.trainer = :trainer", PokemonInstance.class)
+                    .setParameter("trainer", trainer)
+                    .getResultList();
         } finally {
-            em.close();
+            entityManager.close();
         }
     }
 
-    public Optional<PokemonInstance> findById(Long id) {
-        EntityManager em = entityManagerFactory.createEntityManager();
+    public Long countByTrainerIsNull() {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
         try {
-            PokemonInstance instance = em.find(PokemonInstance.class, id);
+            return entityManager
+                    .createQuery("SELECT COUNT(p) FROM PokemonInstance p WHERE p.trainer IS NULL", Long.class)
+                    .getSingleResult();
+        } finally {
+            entityManager.close();
+        }
+    }
+
+    public Optional<PokemonInstance> findRandomAvailable() {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        try {
+            List<PokemonInstance> results = entityManager.createNativeQuery(
+                    "SELECT * FROM pokemon_instances WHERE trainer_id IS NULL ORDER BY RAND() LIMIT 1",
+                    PokemonInstance.class)
+                    .getResultList();
+
+            if (results.isEmpty()) {
+                return Optional.empty();
+            }
+            return Optional.of(results.get(0));
+        } finally {
+            entityManager.close();
+        }
+    }
+
+    public List<PokemonInstance> findAll() {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        try {
+            return entityManager.createQuery("SELECT p FROM PokemonInstance p", PokemonInstance.class)
+                    .getResultList();
+        } finally {
+            entityManager.close();
+        }
+    }
+
+    public Optional<PokemonInstance> findById(UUID id) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        try {
+            PokemonInstance instance = entityManager.find(PokemonInstance.class, id);
             return Optional.ofNullable(instance);
         } finally {
-            em.close();
+            entityManager.close();
         }
     }
 
-    public boolean existsById(Long id) {
-        return findById(id).isPresent();
-    }
-
-    public PokemonInstance save(PokemonInstance pokemonInstance) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        EntityTransaction transaction = em.getTransaction();
-
+    public PokemonInstance save(PokemonInstance instance) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
         try {
-            transaction.begin();
-
-            if (pokemonInstance.getId() == null) {
-                em.persist(pokemonInstance);
+            entityManager.getTransaction().begin();
+            if (instance.getId() == null) {
+                entityManager.persist(instance);
             } else {
-                pokemonInstance = em.merge(pokemonInstance);
+                instance = entityManager.merge(instance);
             }
-
-            transaction.commit();
-            return pokemonInstance;
+            entityManager.getTransaction().commit();
+            return instance;
         } catch (Exception e) {
-            if (transaction.isActive()) {
-                transaction.rollback();
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
             }
             throw e;
         } finally {
-            em.close();
+            entityManager.close();
         }
     }
 
-    public void deleteById(Long id) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        EntityTransaction transaction = em.getTransaction();
-
+    public void deleteById(UUID id) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
         try {
-            transaction.begin();
-            PokemonInstance instance = em.find(PokemonInstance.class, id);
+            entityManager.getTransaction().begin();
+            PokemonInstance instance = entityManager.find(PokemonInstance.class, id);
             if (instance != null) {
-                em.remove(instance);
+                entityManager.remove(instance);
             }
-            transaction.commit();
+            entityManager.getTransaction().commit();
         } catch (Exception e) {
-            if (transaction.isActive()) {
-                transaction.rollback();
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
             }
             throw e;
         } finally {
-            em.close();
+            entityManager.close();
         }
     }
 }

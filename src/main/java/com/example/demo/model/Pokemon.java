@@ -1,40 +1,27 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Table(name = "pokemon")
+@Table(name = "pokemons")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Pokemon {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private Integer numero;
+
+    @Column(nullable = false)
     private String nome;
 
-    public Pokemon() {
-
-    }
-
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Integer getNumero() {
-        return numero;
-    }
-    public void setNumero(Integer numero) {
-        this.numero = numero;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
 }
